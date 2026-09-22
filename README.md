@@ -1,6 +1,6 @@
-# our-web
+# NeWeb
 
-Web propia de "Webs para negocios" (venta de webs hechas con IA).
+Web propia de NeWeb (venta de webs hechas con IA).
 
 ## Estado actual
 
@@ -8,11 +8,16 @@ Este repo arrancó reconstruyendo, a partir de capturas de pantalla, la demo de 
 
 Si se dispone del código fuente original (zip/repo del proyecto real), debería sustituir a esta reconstrucción para no mantener dos versiones divergentes.
 
+Desde la reconstrucción inicial se ha añadido:
+- Rebrand a **NeWeb**.
+- Animaciones de entrada (hero) y de aparición al hacer scroll (`data-reveal` + `IntersectionObserver`) en el resto de secciones, con `prefers-reduced-motion` respetado.
+- Sección **Portfolio** con ejemplos de webs ya diseñadas por sector (peluquería, fisioterapia, clínica veterinaria).
+
 ## Estructura
 
-- `index.html` — toda la landing (header, hero, qué incluye, planes, equipo, contacto)
-- `css/styles.css` — estilos
-- `js/main.js` — JS mínimo
+- `index.html` — toda la landing (header, hero, qué incluye, portfolio, planes, equipo, contacto)
+- `css/styles.css` — estilos y animaciones
+- `js/main.js` — reveal on scroll + shadow del header al hacer scroll
 
 ## Desarrollo local
 

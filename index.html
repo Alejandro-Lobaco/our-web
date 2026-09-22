@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Webs para negocios</title>
-<meta name="description" content="Creamos webs modernas, profesionales y adaptadas a cada negocio." />
+<title>NeWeb — Webs para negocios</title>
+<meta name="description" content="NeWeb crea webs modernas, profesionales y adaptadas a cada negocio." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234b5eea'/%3E%3Cstop offset='1' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='6' y='6' width='20' height='20' rx='6' fill='url(%23g)' transform='rotate(45 16 16)'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -12,12 +13,17 @@
 </head>
 <body>
 
-<header class="site-header">
+<header class="site-header" id="site-header">
   <div class="container header-inner">
     <a href="#top" class="logo">
       <span class="logo-mark" aria-hidden="true"></span>
-      Webs para negocios
+      NeWeb
     </a>
+    <nav class="header-nav">
+      <a href="#portfolio">Portfolio</a>
+      <a href="#planes">Planes</a>
+      <a href="#equipo">Equipo</a>
+    </nav>
     <a href="#contacto" class="btn btn-dark btn-sm">Contacto</a>
   </div>
 </header>
@@ -25,14 +31,16 @@
 <main id="top">
 
   <section class="hero">
+    <span class="hero-blob hero-blob-1" aria-hidden="true"></span>
+    <span class="hero-blob hero-blob-2" aria-hidden="true"></span>
     <div class="container hero-inner">
-      <h1>Tu negocio merece <span class="text-gradient">una buena web.</span></h1>
-      <p class="hero-sub">Creamos webs modernas, profesionales y adaptadas a cada negocio.</p>
-      <div class="hero-actions">
+      <h1 class="hero-anim" style="--d:0ms">Tu negocio merece <span class="text-gradient">una buena web.</span></h1>
+      <p class="hero-sub hero-anim" style="--d:90ms">Creamos webs modernas, profesionales y adaptadas a cada negocio.</p>
+      <div class="hero-actions hero-anim" style="--d:180ms">
         <a href="#planes" class="btn btn-primary btn-lg">Ver planes</a>
         <a href="#contacto" class="btn btn-outline btn-lg">Hablar con nosotros</a>
       </div>
-      <ul class="hero-badges">
+      <ul class="hero-badges hero-anim" style="--d:270ms">
         <li>✓ Diseño personalizado</li>
         <li>✓ Adaptada a móvil</li>
         <li>✓ Garantía incluida</li>
@@ -42,55 +50,98 @@
 
   <section class="section section-muted" id="incluye">
     <div class="container">
-      <h2 class="section-title">¿Qué incluye?</h2>
+      <h2 class="section-title" data-reveal>¿Qué incluye?</h2>
       <div class="features-grid">
-        <div class="feature-card">
+        <div class="feature-card" data-reveal>
           <span class="feature-icon">🎨</span>
           <span class="feature-label">Diseño personalizado</span>
         </div>
-        <div class="feature-card">
+        <div class="feature-card" data-reveal>
           <span class="feature-icon">📱</span>
           <span class="feature-label">Adaptada a móvil</span>
         </div>
-        <div class="feature-card">
+        <div class="feature-card" data-reveal>
           <span class="feature-icon">🖼️</span>
           <span class="feature-label">Galería y contenido</span>
         </div>
-        <div class="feature-card">
+        <div class="feature-card" data-reveal>
           <span class="feature-icon">⭐</span>
           <span class="feature-label">Opiniones</span>
         </div>
-        <div class="feature-card">
+        <div class="feature-card" data-reveal>
           <span class="feature-icon">📅</span>
           <span class="feature-label">Reservas</span>
         </div>
-        <div class="feature-card">
+        <div class="feature-card" data-reveal>
           <span class="feature-icon">💬</span>
           <span class="feature-label">WhatsApp y contacto</span>
         </div>
       </div>
 
-      <div class="info-box">
+      <div class="info-box" data-reveal>
         <span class="info-icon">🌐</span>
         <p>El dominio es tuyo. Te ayudamos a elegirlo, comprarlo y conectarlo con tu web.</p>
       </div>
 
-      <p class="warranty-heading"><span class="info-icon">🛡️</span> Garantía incluida en todos los planes.</p>
-      <div class="warranty-badges">
+      <p class="warranty-heading" data-reveal><span class="info-icon">🛡️</span> Garantía incluida en todos los planes.</p>
+      <div class="warranty-badges" data-reveal>
         <span class="warranty-pill">Básica <strong>1 mes</strong></span>
         <span class="warranty-pill">Profesional <strong>2 meses</strong></span>
         <span class="warranty-pill">Premium <strong>4 meses</strong></span>
       </div>
-      <p class="warranty-note">La garantía cubre problemas técnicos causados por nuestro trabajo. No incluye nuevos cambios o funcionalidades.</p>
+      <p class="warranty-note" data-reveal>La garantía cubre problemas técnicos causados por nuestro trabajo. No incluye nuevos cambios o funcionalidades.</p>
     </div>
   </section>
 
-  <section class="section" id="planes">
+  <section class="section" id="portfolio">
     <div class="container">
-      <h2 class="section-title">Elige tu plan</h2>
+      <h2 class="section-title" data-reveal>Nuestro trabajo</h2>
+      <p class="section-sub" data-reveal>Algunas webs que ya hemos diseñado para negocios reales, adaptadas a su sector.</p>
+      <div class="portfolio-grid">
+
+        <article class="portfolio-card" data-reveal>
+          <div class="portfolio-cover portfolio-cover-1">
+            <span class="portfolio-emoji">💇</span>
+          </div>
+          <div class="portfolio-body">
+            <span class="portfolio-tag">Belleza y peluquería</span>
+            <h3>Peluquería</h3>
+            <p>Reserva de citas, galería de trabajos y ficha de servicios pensada para captar clientela local.</p>
+          </div>
+        </article>
+
+        <article class="portfolio-card" data-reveal>
+          <div class="portfolio-cover portfolio-cover-2">
+            <span class="portfolio-emoji">🩺</span>
+          </div>
+          <div class="portfolio-body">
+            <span class="portfolio-tag">Salud y fisioterapia</span>
+            <h3>Fisioterapia</h3>
+            <p>Presentación de tratamientos, opiniones de pacientes y contacto directo por WhatsApp.</p>
+          </div>
+        </article>
+
+        <article class="portfolio-card" data-reveal>
+          <div class="portfolio-cover portfolio-cover-3">
+            <span class="portfolio-emoji">🐾</span>
+          </div>
+          <div class="portfolio-body">
+            <span class="portfolio-tag">Veterinaria</span>
+            <h3>Clínica veterinaria</h3>
+            <p>Web de presentación con servicios, equipo y formulario de contacto para nuevos pacientes.</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-muted" id="planes">
+    <div class="container">
+      <h2 class="section-title" data-reveal>Elige tu plan</h2>
       <div class="plans-grid">
 
-        <article class="plan-card plan-basica">
+        <article class="plan-card plan-basica" data-reveal>
           <p class="plan-name">BÁSICA</p>
           <p class="plan-price">99 <span class="plan-currency">€</span></p>
           <p class="plan-desc">Todo lo necesario para empezar.</p>
@@ -106,7 +157,7 @@
           <a href="#contacto" class="btn btn-outline-basica btn-block">Elegir Básica</a>
         </article>
 
-        <article class="plan-card plan-profesional">
+        <article class="plan-card plan-profesional" data-reveal>
           <span class="plan-badge">MÁS ELEGIDA</span>
           <p class="plan-name">PROFESIONAL</p>
           <p class="plan-price">199 <span class="plan-currency">€</span></p>
@@ -122,7 +173,7 @@
           <a href="#contacto" class="btn btn-primary btn-block">Elegir Profesional</a>
         </article>
 
-        <article class="plan-card plan-premium">
+        <article class="plan-card plan-premium" data-reveal>
           <p class="plan-name">PREMIUM</p>
           <p class="plan-price">299 <span class="plan-currency">€</span></p>
           <p class="plan-desc">La opción más completa.</p>
@@ -144,19 +195,19 @@
 
   <section class="section" id="equipo">
     <div class="container">
-      <h2 class="section-title">¿Quién está detrás?</h2>
-      <p class="section-sub">Somos un equipo joven y trabajamos juntos en cada proyecto, desde el diseño hasta la entrega.</p>
+      <h2 class="section-title" data-reveal>¿Quién está detrás?</h2>
+      <p class="section-sub" data-reveal>Somos un equipo joven y trabajamos juntos en cada proyecto, desde el diseño hasta la entrega.</p>
       <div class="team-list">
-        <div class="team-pill">Ivan Menendez</div>
-        <div class="team-pill">Alejandro Lobaco</div>
-        <div class="team-pill">Ivan Gonzalez</div>
+        <div class="team-pill" data-reveal>Ivan Menendez</div>
+        <div class="team-pill" data-reveal>Alejandro Lobaco</div>
+        <div class="team-pill" data-reveal>Ivan Gonzalez</div>
       </div>
     </div>
   </section>
 
   <section class="section" id="contacto">
     <div class="container">
-      <div class="cta-box">
+      <div class="cta-box" data-reveal>
         <h2>¿Hablamos?</h2>
         <p>Cuéntanos qué negocio tienes y qué necesitas. Te ayudaremos a encontrar el plan adecuado.</p>
         <a class="cta-email" href="mailto:ivanmenenpal@gmail.com">📧 ivanmenenpal@gmail.com</a>
@@ -169,7 +220,7 @@
 
 <footer class="site-footer">
   <div class="container">
-    <p>&copy; <span id="year"></span> Webs para negocios. Todos los derechos reservados.</p>
+    <p>&copy; <span id="year"></span> NeWeb. Todos los derechos reservados.</p>
   </div>
 </footer>
 
