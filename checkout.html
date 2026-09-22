@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pago — NeWeb</title>
+<meta name="description" content="Confirma tu plan y completa el pago de demostración de NeWeb." />
+<meta name="robots" content="noindex" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234b5eea'/%3E%3Cstop offset='1' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='6' y='6' width='20' height='20' rx='6' fill='url(%23g)' transform='rotate(45 16 16)'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<header class="site-header" id="site-header">
+  <div class="container header-inner">
+    <a href="index.html#top" class="logo">
+      <span class="logo-mark" aria-hidden="true"></span>
+      NeWeb
+    </a>
+  </div>
+</header>
+
+<main class="checkout-main">
+  <div class="container checkout-container">
+    <a href="index.html#planes" class="back-link">← Volver a los planes</a>
+
+    <p class="demo-banner">🧪 Página de pago de demostración — no se realiza ningún cargo real.</p>
+
+    <div class="checkout-grid">
+
+      <section class="checkout-summary">
+        <h1>Confirma tu pedido</h1>
+
+        <div class="order-card" id="order-card">
+          <p class="order-plan-name" id="order-plan-name">Plan</p>
+          <p class="order-plan-price"><span id="order-plan-price">0</span> €</p>
+          <p class="order-plan-desc" id="order-plan-desc"></p>
+          <ul class="order-features" id="order-features"></ul>
+        </div>
+
+        <div class="terms-box">
+          <h2>Términos y condiciones</h2>
+          <p class="terms-disclaimer">Texto de ejemplo mientras redactamos las condiciones legales definitivas.</p>
+          <div class="terms-text">
+            <p><strong>1. Objeto.</strong> Estas condiciones regulan la contratación de los servicios de diseño y desarrollo web ofrecidos por NeWeb al cliente que selecciona un plan en esta página.</p>
+            <p><strong>2. Precio y pago.</strong> El importe indicado incluye IVA y se abona en el momento de la contratación. Los precios pueden variar según funcionalidades adicionales acordadas fuera de los planes publicados.</p>
+            <p><strong>3. Plazos de entrega.</strong> El plazo estimado de entrega es de 7 a 15 días laborables desde la recepción de todo el contenido necesario (textos, imágenes, accesos y, en su caso, dominio).</p>
+            <p><strong>4. Revisiones.</strong> Cada plan incluye un número determinado de revisiones de diseño. Las revisiones adicionales a las incluidas podrán tener un coste extra a acordar.</p>
+            <p><strong>5. Garantía.</strong> La garantía cubre exclusivamente incidencias técnicas derivadas de nuestro trabajo durante el periodo indicado en el plan contratado. No cubre cambios de contenido, nuevas funcionalidades, ni fallos de servicios de terceros (hosting, dominio, pasarelas de pago, etc.).</p>
+            <p><strong>6. Dominio y hosting.</strong> El dominio queda siempre a nombre del cliente. NeWeb ayuda a elegirlo, comprarlo y conectarlo, pero no se hace responsable de su renovación.</p>
+            <p><strong>7. Cancelación.</strong> El cliente puede cancelar el proyecto antes del inicio del desarrollo con derecho a reembolso íntegro. Una vez iniciado el desarrollo, el importe abonado no es reembolsable.</p>
+            <p><strong>8. Propiedad.</strong> Una vez completado el pago y la entrega, el cliente es propietario del diseño final entregado.</p>
+          </div>
+          <label class="terms-check">
+            <input type="checkbox" id="accept-terms" />
+            <span>He leído y acepto los términos y condiciones.</span>
+          </label>
+        </div>
+
+        <button type="button" class="pay-hold-btn" id="pay-btn" disabled>
+          <span class="pay-hold-fill" aria-hidden="true"></span>
+          <span class="pay-hold-label">Mantén pulsado para pagar</span>
+        </button>
+        <p class="pay-hint">Para evitar pagos accidentales, mantén pulsado el botón un par de segundos.</p>
+      </section>
+
+      <section class="receipt-stage">
+        <div class="tpv">
+          <p class="tpv-brand">NeWeb Pay</p>
+          <div class="tpv-screen">
+            <span id="tpv-status">Esperando pago…</span>
+          </div>
+          <div class="tpv-slot" aria-hidden="true"></div>
+          <div class="receipt-well" id="receipt-well">
+            <div class="receipt-paper" id="receipt-paper">
+              <p class="receipt-line receipt-title">NeWeb</p>
+              <p class="receipt-line">Webs para negocios</p>
+              <p class="receipt-line receipt-dashes">--------------------------------</p>
+              <p class="receipt-line" id="receipt-date"></p>
+              <p class="receipt-line" id="receipt-order"></p>
+              <p class="receipt-line receipt-dashes">--------------------------------</p>
+              <p class="receipt-line" id="receipt-plan-line"></p>
+              <p class="receipt-line" id="receipt-total-line"></p>
+              <p class="receipt-line receipt-dashes">--------------------------------</p>
+              <p class="receipt-line receipt-status">PAGO ACEPTADO ✓</p>
+              <p class="receipt-line receipt-thanks">¡Gracias por confiar en NeWeb!</p>
+              <p class="receipt-line receipt-fake">*** Tique de demostración, sin validez real ***</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="checkout-success" id="checkout-success">
+          <p class="checkout-success-title">¡Pago simulado con éxito!</p>
+          <p class="checkout-success-text">Nos pondremos en contacto contigo para arrancar el proyecto.</p>
+          <a href="index.html#top" class="btn btn-primary">Volver al inicio</a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<script src="js/checkout.js"></script>
+</body>
+</html>

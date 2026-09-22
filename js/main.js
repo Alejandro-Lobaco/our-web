@@ -1,7 +1,7 @@
 document.getElementById("year").textContent = new Date().getFullYear();
 
 // Stagger delay per item inside each grid, used by the CSS transition-delay rule.
-document.querySelectorAll(".features-grid, .portfolio-grid, .plans-grid, .team-list").forEach((grid) => {
+document.querySelectorAll(".features-grid, .plans-grid, .team-list").forEach((grid) => {
   grid.querySelectorAll("[data-reveal]").forEach((el, i) => {
     el.style.setProperty("--i", i);
   });

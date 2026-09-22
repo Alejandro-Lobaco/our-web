@@ -356,7 +356,6 @@ ul {
 }
 
 .features-grid [data-reveal],
-.portfolio-grid [data-reveal],
 .plans-grid [data-reveal],
 .team-list [data-reveal] {
   transition-delay: calc(var(--i, 0) * 90ms);
@@ -496,78 +495,32 @@ ul {
   margin: 0 auto;
 }
 
-/* Portfolio */
-.portfolio-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-}
-
-@media (min-width: 760px) {
-  .portfolio-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.portfolio-card {
-  background: var(--white);
-  border: 1px solid var(--gray-200);
+/* Portfolio (empty state) */
+.portfolio-empty {
+  max-width: 480px;
+  margin: 40px auto 0;
+  text-align: center;
+  padding: 56px 32px;
+  border: 2px dashed var(--gray-200);
   border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+  background: var(--gray-100);
 }
 
-.portfolio-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 24px 44px rgba(18, 20, 43, 0.12);
+.portfolio-empty-icon {
+  display: inline-flex;
+  font-size: 2.2rem;
+  margin-bottom: 16px;
 }
 
-.portfolio-cover {
-  height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.portfolio-emoji {
-  font-size: 3rem;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.portfolio-card:hover .portfolio-emoji {
-  transform: scale(1.15) rotate(-6deg);
-}
-
-.portfolio-cover-1 { background: linear-gradient(135deg, #ffe3ef 0%, #ffd0e6 100%); }
-.portfolio-cover-2 { background: linear-gradient(135deg, #dcecff 0%, #cfe0ff 100%); }
-.portfolio-cover-3 { background: linear-gradient(135deg, #e2f8ec 0%, #cdf0dd 100%); }
-
-.portfolio-body {
-  padding: 24px;
-  text-align: left;
-}
-
-.portfolio-tag {
-  display: inline-block;
-  font-size: 0.75rem;
+.portfolio-empty-title {
   font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--blue);
-  margin-bottom: 10px;
-}
-
-.portfolio-body h3 {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   margin-bottom: 8px;
 }
 
-.portfolio-body p {
-  font-size: 0.92rem;
+.portfolio-empty-text {
   color: var(--gray-600);
-  line-height: 1.5;
+  font-size: 0.92rem;
 }
 
 /* Plans */
@@ -768,6 +721,345 @@ ul {
   margin: 0 auto;
 }
 
+/* Checkout page */
+.checkout-main {
+  padding: 40px 0 80px;
+}
+
+.checkout-container {
+  max-width: 980px;
+}
+
+.back-link {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  margin-bottom: 20px;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: var(--blue);
+}
+
+.demo-banner {
+  background: #fff7e6;
+  border: 1px solid #ffe1a8;
+  color: #8a5a00;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  margin-bottom: 32px;
+}
+
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .checkout-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+}
+
+.checkout-summary h1 {
+  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  margin-bottom: 24px;
+}
+
+.order-card {
+  background: var(--white);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 28px;
+}
+
+.order-card-basica { border-color: var(--green); }
+.order-card-profesional { border-color: var(--blue); }
+.order-card-premium { border-color: var(--purple); }
+
+.order-plan-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.order-plan-price {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.order-plan-desc {
+  color: var(--gray-600);
+  font-size: 0.92rem;
+  margin-bottom: 18px;
+}
+
+.order-features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-features li {
+  font-size: 0.9rem;
+  padding-left: 22px;
+  position: relative;
+}
+
+.order-features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.terms-box {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.terms-box h2 {
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+}
+
+.terms-disclaimer {
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  font-style: italic;
+  margin-bottom: 14px;
+}
+
+.terms-text {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 8px;
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-200);
+  padding-top: 14px;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+}
+
+.terms-text strong {
+  color: var(--navy);
+}
+
+.terms-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.terms-check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  accent-color: var(--blue);
+  flex-shrink: 0;
+}
+
+/* Press-and-hold pay button */
+.pay-hold-btn {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 18px 32px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--white);
+  background: var(--gray-600);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.pay-hold-btn:not(:disabled) {
+  background: var(--gradient-brand);
+}
+
+.pay-hold-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.pay-hold-fill {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.32);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.pay-hold-btn.is-holding .pay-hold-fill {
+  transition: transform var(--hold-duration, 1600ms) linear;
+  transform: scaleX(1);
+}
+
+.pay-hold-btn.is-success {
+  background: var(--green);
+}
+
+.pay-hold-label {
+  position: relative;
+  z-index: 1;
+}
+
+.pay-hint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  margin-top: 12px;
+}
+
+/* Receipt / TPV */
+.receipt-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.tpv {
+  width: 100%;
+  max-width: 280px;
+  background: var(--navy);
+  border-radius: 22px;
+  padding: 22px 22px 0;
+  box-shadow: var(--shadow-card);
+}
+
+.tpv-brand {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.tpv-screen {
+  background: #0c1024;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  font-family: "Courier New", monospace;
+  font-size: 0.85rem;
+  color: #7ce6ff;
+  margin-bottom: 18px;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tpv-slot {
+  height: 10px;
+  background: #05061a;
+  border-radius: 6px 6px 0 0;
+  margin: 0 20px;
+}
+
+.receipt-well {
+  height: 0;
+  overflow: hidden;
+  margin: 0 16px;
+  background: #fdfdfb;
+  border-left: 1px solid #e6e6e0;
+  border-right: 1px solid #e6e6e0;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+  transition: height 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.receipt-paper {
+  padding: 18px 16px 22px;
+  font-family: "Courier New", monospace;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: #22232b;
+}
+
+.receipt-line {
+  margin: 0;
+  text-align: center;
+  white-space: pre-wrap;
+}
+
+.receipt-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.receipt-dashes {
+  color: #999;
+}
+
+.receipt-status {
+  font-weight: 700;
+  color: #1a8f4c;
+  margin-top: 4px;
+}
+
+.receipt-fake {
+  font-size: 0.68rem;
+  color: #999;
+  margin-top: 6px;
+}
+
+.checkout-success {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  height: 0;
+  overflow: hidden;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.checkout-success.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  height: auto;
+}
+
+.checkout-success-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.checkout-success-text {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
 /* Footer */
 .site-footer {
   padding: 32px 0;
@@ -797,9 +1089,13 @@ ul {
 
   .btn:hover,
   .feature-card:hover,
-  .portfolio-card:hover,
   .plan-card:hover,
   .team-pill:hover {
     transform: none !important;
+  }
+
+  .pay-hold-btn.is-holding .pay-hold-fill,
+  .receipt-well {
+    transition-duration: 0.01ms !important;
   }
 }
