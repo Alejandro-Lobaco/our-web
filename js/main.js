@@ -38,3 +38,15 @@ if (header) {
   updateHeader();
   window.addEventListener("scroll", updateHeader, { passive: true });
 }
+
+// Mobile sticky CTA appears once the visitor has scrolled past the hero.
+const mobileCta = document.getElementById("mobile-cta");
+
+if (mobileCta) {
+  const updateMobileCta = () => {
+    mobileCta.classList.toggle("is-visible", window.scrollY > 400);
+  };
+
+  updateMobileCta();
+  window.addEventListener("scroll", updateMobileCta, { passive: true });
+}
