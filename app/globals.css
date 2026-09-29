@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #070708;
+  --color-bone: #ece8e1;
+  --color-mute: #8f8b85;
+  --color-ember: #ff9a3c;
+  --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-serif), ui-serif, Georgia, serif;
+}
+
+html {
+  background: var(--color-ink);
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--color-ember);
+  color: #000;
+}
+
+/* Botones: sin selección al mantener pulsado ni menú contextual en iOS. */
+button {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ember);
+  outline-offset: 3px;
+}
+
+/* Viñeta y oscurecido de bordes: el centro del producto queda limpio. */
+.edge-shade {
+  background:
+    radial-gradient(ellipse 75% 70% at 50% 48%, transparent 55%, rgba(7, 7, 8, 0.55) 100%),
+    linear-gradient(to bottom, rgba(7, 7, 8, 0.7), transparent 16%, transparent 72%, rgba(7, 7, 8, 0.8));
+}
+
+/* Scrim ligero bajo el texto: la animación se sigue viendo detrás. */
+.scrim {
+  position: relative;
+  isolation: isolate;
+}
+.scrim::before {
+  content: "";
+  position: absolute;
+  inset: -3rem -4rem;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(7, 7, 8, 0.62), rgba(7, 7, 8, 0));
+  pointer-events: none;
+}
+
+.ascua-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+  will-change: transform;
+}
+.ascua-label-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--color-bone);
+}
+.ascua-label-spec {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+}
+@media (max-width: 639px) {
+  .ascua-label-title {
+    font-size: 0.95rem;
+  }
+  .ascua-label-spec {
+    display: none;
+  }
+}
+
+[data-r] {
+  will-change: opacity, transform;
+}
+
+@keyframes scroll-cue {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  45% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+.scroll-cue {
+  animation: scroll-cue 2.4s var(--ease-out-quint) infinite;
+}
+
+@keyframes loader-bar {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+.loader-bar {
+  animation: loader-bar 1.3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue,
+  .loader-bar {
+    animation: none;
+  }
+}
