@@ -18,6 +18,7 @@ html {
   background: var(--color-ink);
   color-scheme: dark;
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -26,12 +27,15 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -webkit-tap-highlight-color: transparent;
 }
 
 ::selection {
   background: var(--color-ember);
   color: #000;
+}
+
+a {
+  touch-action: manipulation;
 }
 
 /* Botones: sin selección al mantener pulsado ni menú contextual en iOS. */

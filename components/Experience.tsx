@@ -201,7 +201,7 @@ export default function Experience() {
       </div>
 
       {/* Navegación */}
-      <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between px-5 pt-[env(safe-area-inset-top)] md:h-20 md:px-12">
+      <header className="fixed inset-x-0 top-0 z-40 flex h-[calc(4rem+env(safe-area-inset-top,0px))] items-center justify-between px-5 pt-[env(safe-area-inset-top,0px)] md:h-[calc(5rem+env(safe-area-inset-top,0px))] md:px-12">
         <a href="#inicio" className="font-display text-2xl tracking-[0.28em]" aria-label="ASCUA, inicio">
           ASCUA
         </a>
@@ -257,7 +257,7 @@ export default function Experience() {
         }`}
         inert={!menu}
       >
-        <div className="flex h-16 items-center justify-between px-5 pt-[env(safe-area-inset-top)]">
+        <div className="flex h-[calc(4rem+env(safe-area-inset-top,0px))] items-center justify-between px-5 pt-[env(safe-area-inset-top,0px)]">
           <span className="font-display text-2xl tracking-[0.28em]">ASCUA</span>
           <button
             type="button"
@@ -341,7 +341,7 @@ export default function Experience() {
 
         {/* 02 · Despiece */}
         <section id={ACTS[2].id} style={{ height: `${ACTS[2].vh}vh` }}>
-          <div className="sticky top-0 flex h-svh flex-col justify-between px-5 pt-20 pb-10 md:px-12 md:pt-28 md:pb-14">
+          <div className="sticky top-0 flex h-svh flex-col justify-between px-5 pt-[calc(5rem+env(safe-area-inset-top,0px))] pb-10 md:px-12 md:pt-28 md:pb-14">
             <div className="max-w-xs md:max-w-sm">
               <Kicker n="02" r={0}>
                 Despiece
