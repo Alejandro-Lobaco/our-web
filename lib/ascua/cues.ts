@@ -2,7 +2,11 @@
  * Guion de cámara. `at` es la posición en la línea de tiempo del scroll:
  * parte entera = índice de sección, decimal = avance dentro de ella.
  *
- * 0 Hero · 1 Apertura · 2 Despiece · 3 Órbita · 4 Detalle · 5 Encender · 6 Cierre
+ * 0 Hero · 1 Despiece · 2 Material · 3 Detalle · 4 Encender · 5 Acabados
+ *
+ * Regla de ritmo: cada acto se asienta hacia el 20 % de su sección, aguanta
+ * mientras se lee el texto y sale a partir del ~60 %. Ninguna transición
+ * ocupa menos de ~1,5 pantallas de scroll.
  */
 export interface Cue {
   at: number;
@@ -18,6 +22,10 @@ export interface Cue {
   explode: number;
   idle: number;
   timeScale: number;
+  /** Rótulo gigante detrás del producto (0–1). */
+  mark: number;
+  /** Brasas flotando en el aire (0–1). */
+  embers: number;
   /** Desplazamiento del producto en pantalla (fracción del viewport), escritorio. */
   sx: number;
   sy: number;
@@ -29,31 +37,26 @@ export interface Cue {
 type CueInput = Partial<Cue> & { at: number };
 
 const RAW: CueInput[] = [
-  // 0 · Hero: pequeño, mucho negro alrededor
-  { at: 0.0, target: [0, 29, 0], size: 124, width: 84, az: 24, el: 7, lid: 0, explode: 0, idle: 1, timeScale: 1, sx: 0.17, sy: 0.02, msx: 0, msy: -0.13 },
-  { at: 0.55, size: 112, az: 20 },
-  // 1 · Apertura
-  { at: 1.0, target: [3, 33, 0], size: 100, width: 84, az: 12, el: 11, idle: 0.2, sx: 0.17, msy: -0.14 },
-  { at: 1.3, target: [9, 38, 0], size: 94, width: 100, az: 4, el: 14, lid: 0, idle: 0 },
-  { at: 1.62, target: [17, 40, 0], size: 104, width: 118, az: -8, el: 16, lid: 1, sx: 0.14, msy: -0.12 },
-  { at: 1.95, target: [17, 39, 0], size: 110, width: 122, az: -14, el: 14 },
-  // 2 · Despiece
-  { at: 2.08, target: [4, 50, 0], size: 124, width: 104, az: -6, el: 10, lid: 1, explode: 0, sx: 0.12, sy: 0.02, msy: -0.03 },
-  { at: 2.45, target: [4, 66, 0], size: 158, width: 118, az: 10, el: 7, explode: 1 },
-  { at: 2.88, target: [4, 66, 0], size: 158, width: 118, az: 20, el: 8, explode: 1 },
-  // 3 · Órbita (remontaje al entrar)
-  { at: 3.08, target: [10, 38, 0], size: 112, width: 118, az: 36, el: 12, explode: 0, sx: -0.2, sy: 0, msy: -0.12 },
-  { at: 3.92, target: [10, 38, 0], size: 108, width: 114, az: 396, el: 18 },
-  // 4 · Detalle: macro de rueda y chimenea, cámara lenta
-  { at: 4.1, target: [1.5, 50, 0], size: 40, width: 46, az: 398, el: 40, sx: 0.16, sy: -0.02, msy: -0.1, timeScale: 0.32 },
-  { at: 4.55, target: [3.2, 51, 0], size: 27, width: 32, az: 408, el: 38, timeScale: 0.28 },
-  { at: 4.92, target: [2, 50, 0], size: 44, width: 50, az: 392, el: 30, timeScale: 0.6 },
-  // 5 · Encender
-  { at: 5.1, target: [10, 47, 0], size: 100, width: 110, az: 372, el: 10, sx: 0.17, sy: 0.0, msy: -0.1, timeScale: 1 },
-  { at: 5.9, target: [10, 49, 0], size: 96, width: 106, az: 366, el: 9 },
-  // 6 · Cierre: vuelve al hero
-  { at: 6.12, target: [0, 29, 0], size: 120, width: 84, az: 384, el: 7, lid: 0, idle: 1, sx: -0.19, sy: 0.02, msy: -0.14 },
-  { at: 7.0, size: 116, az: 380 },
+  // 0 · Hero: abierto y encendido, rótulo detrás
+  { at: 0.0, target: [7, 36, 0], size: 116, width: 96, az: 20, el: 8, lid: 1, explode: 0, idle: 1, timeScale: 1, mark: 1, embers: 1, sx: 0.16, sy: 0.02, msx: 0, msy: -0.18 },
+  { at: 0.35, size: 110, az: 16 },
+  // 1 · Despiece (se abre entre el final del hero y el 22 % del acto)
+  { at: 1.22, target: [4, 64, 0], size: 160, width: 120, az: 6, el: 7, explode: 1, idle: 0, mark: 0, embers: 0.35, sx: 0.12, sy: 0.02, msy: 0.05 },
+  { at: 1.62, az: 20, el: 8 },
+  // 2 · Material: remontaje y media órbita lenta
+  { at: 2.2, target: [10, 38, 0], size: 112, width: 118, az: 40, el: 12, explode: 0, embers: 0.3, sx: -0.2, sy: 0, msy: -0.12 },
+  { at: 2.7, size: 108, width: 114, az: 220, el: 16 },
+  // 3 · Detalle: la órbita sigue hasta la macro de la rueda, cámara lenta
+  { at: 3.22, target: [1.5, 50, 0], size: 40, width: 46, az: 398, el: 40, sx: 0.16, sy: -0.02, msy: -0.1, timeScale: 0.32 },
+  { at: 3.45, target: [3.2, 51, 0], size: 27, width: 32, az: 408, el: 38, timeScale: 0.28 },
+  { at: 3.6, size: 30, width: 35, az: 404, el: 36, timeScale: 0.3 },
+  // 4 · Encender
+  { at: 4.22, target: [10, 47, 0], size: 100, width: 110, az: 372, el: 10, sx: 0.17, sy: 0, msy: -0.1, timeScale: 1, embers: 0.6 },
+  { at: 4.62, target: [10, 49, 0], size: 96, width: 106, az: 366, el: 9 },
+  // 5 · Acabados: la tapa se cierra y vuelve el plano de hero
+  { at: 5.0, target: [5, 38, 0], size: 106, width: 96, az: 376, el: 8, lid: 1, sx: -0.02, msy: -0.12 },
+  { at: 5.22, target: [0, 29, 0], size: 118, width: 84, az: 384, el: 7, lid: 0, idle: 1, mark: 0.45, embers: 0.7, sx: -0.19, sy: 0.02, msy: -0.26 },
+  { at: 6.0, size: 112, az: 380 },
 ];
 
 export const CUES: Cue[] = (() => {
@@ -66,11 +69,17 @@ export const CUES: Cue[] = (() => {
   return out;
 })();
 
-/** Momentos del guion que disparan eventos (chispas en el detalle). */
-export const BEATS = { sparks: 4.42 };
+/** Momentos del guion que disparan eventos. */
+export const BEATS = {
+  /** Chispas a cámara lenta en la macro. */
+  sparks: 3.47,
+  /** Por debajo de este punto el hero mantiene la llama viva. */
+  heroLit: 0.5,
+};
 
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const KEYS = ["size", "width", "az", "el", "lid", "explode", "idle", "timeScale", "mark", "embers", "sx", "sy", "msx", "msy"] as const;
 
 export function sampleCues(t: number, out: Cue): Cue {
   const cues = CUES;
@@ -81,8 +90,6 @@ export function sampleCues(t: number, out: Cue): Cue {
   const k = b.at > a.at ? smooth(Math.min(1, Math.max(0, (t - a.at) / (b.at - a.at)))) : 0;
   out.at = t;
   out.target = [lerp(a.target[0], b.target[0], k), lerp(a.target[1], b.target[1], k), lerp(a.target[2], b.target[2], k)];
-  for (const key of ["size", "width", "az", "el", "lid", "explode", "idle", "timeScale", "sx", "sy", "msx", "msy"] as const) {
-    out[key] = lerp(a[key], b[key], k);
-  }
+  for (const key of KEYS) out[key] = lerp(a[key], b[key], k);
   return out;
 }

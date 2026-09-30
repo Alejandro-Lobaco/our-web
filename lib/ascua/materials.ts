@@ -61,40 +61,47 @@ function spacedText(ctx: CanvasRenderingContext2D, text: string, cx: number, y: 
 export interface FinishTextures {
   color: THREE.CanvasTexture;
   rough: THREE.CanvasTexture;
+  engrave: THREE.CanvasTexture | null;
 }
 
-/** Acabado negro mate microgranallado, con grabado láser opcional en el frente. */
-export function blackFinish(width: number, height: number, perimeter: number, engrave: boolean, seed: number): FinishTextures {
+/**
+ * Superficie microgranallada neutra: el tono lo pone el acabado elegido
+ * (material.color), así el mismo mapa sirve para negro, acero o latón.
+ * Rugosidad centrada en 0,5 para escalarla con material.roughness.
+ * El grabado va en una máscara aparte y cambia de contraste según el acabado.
+ */
+export function finishTextures(width: number, height: number, perimeter: number, engrave: boolean, seed: number): FinishTextures {
   const r = rand(seed);
   const pxmm = width / perimeter;
 
   const col = canvas(width, height);
-  col.ctx.fillStyle = "#17171a";
+  col.ctx.fillStyle = "#efefef";
   col.ctx.fillRect(0, 0, width, height);
-  blotches(col.ctx, width, height, r, 60, 0.05, "rgba(60,60,66,A)", "rgba(0,0,0,A)");
+  blotches(col.ctx, width, height, r, 60, 0.06, "rgba(255,255,255,A)", "rgba(190,190,190,A)");
 
   const rough = canvas(width, height);
-  rough.ctx.fillStyle = "rgb(118,118,118)";
+  rough.ctx.fillStyle = "rgb(128,128,128)";
   rough.ctx.fillRect(0, 0, width, height);
-  blotches(rough.ctx, width, height, r, 70, 0.12, "rgba(150,150,150,A)", "rgba(80,80,80,A)");
+  blotches(rough.ctx, width, height, r, 70, 0.12, "rgba(160,160,160,A)", "rgba(96,96,96,A)");
   grain(rough.ctx, width, height, r, 26);
 
+  let engraveT: THREE.CanvasTexture | null = null;
   if (engrave) {
+    const m = canvas(width, height);
+    m.ctx.fillStyle = "#000";
+    m.ctx.fillRect(0, 0, width, height);
     const cx = (SPEC.W / 2 - SPEC.R) * pxmm;
     const hmm = height / pxmm;
     const yFromBottom = (mm: number) => height - (mm / hmm) * height;
-    for (const [ctx, fill] of [
-      [col.ctx, "#8d8f95"],
-      [rough.ctx, "rgb(64,64,64)"],
-    ] as const) {
-      ctx.fillStyle = fill;
-      ctx.textBaseline = "alphabetic";
-      ctx.font = `500 ${Math.round(3.1 * pxmm)}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
-      spacedText(ctx, "ASCUA", cx, yFromBottom(5.2), 1.3 * pxmm);
-      ctx.font = `500 ${Math.round(1.05 * pxmm)}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
-      spacedText(ctx, "ACERO 304 · DLC", cx, yFromBottom(3.0), 0.42 * pxmm);
-      ctx.fillRect(cx - 6 * pxmm, yFromBottom(9.3), 12 * pxmm, Math.max(1, 0.12 * pxmm));
-    }
+    m.ctx.fillStyle = "#fff";
+    m.ctx.textBaseline = "alphabetic";
+    m.ctx.font = `500 ${Math.round(3.1 * pxmm)}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+    spacedText(m.ctx, "ASCUA", cx, yFromBottom(5.2), 1.3 * pxmm);
+    m.ctx.font = `500 ${Math.round(1.05 * pxmm)}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+    spacedText(m.ctx, "ACERO 304 · EDICIÓN 01", cx, yFromBottom(3.0), 0.42 * pxmm);
+    m.ctx.fillRect(cx - 6 * pxmm, yFromBottom(9.3), 12 * pxmm, Math.max(1, 0.12 * pxmm));
+    engraveT = new THREE.CanvasTexture(m.c);
+    engraveT.anisotropy = 8;
   }
 
   const color = new THREE.CanvasTexture(col.c);
@@ -102,8 +109,31 @@ export function blackFinish(width: number, height: number, perimeter: number, en
   color.anisotropy = 8;
   const roughT = new THREE.CanvasTexture(rough.c);
   roughT.anisotropy = 8;
-  return { color, rough: roughT };
+  return { color, rough: roughT, engrave: engraveT };
 }
+
+// ── Acabados ──────────────────────────────────────────────────────────────
+export type FinishId = "negro" | "acero" | "laton";
+
+export interface FinishSpec {
+  body: number;
+  metal: number;
+  rough: number;
+  chamfer: number;
+  chamferRough: number;
+  engrave: number;
+  engraveRough: number;
+  engraveMetal: number;
+}
+
+export const FINISH_SPECS: Record<FinishId, FinishSpec> = {
+  // DLC negro: casi dieléctrico, el brillo lo ponen los chaflanes de acero.
+  negro: { body: 0x151518, metal: 0.25, rough: 0.46, chamfer: 0xbabcc1, chamferRough: 0.2, engrave: 0x9a9ca1, engraveRough: 0.3, engraveMetal: 1 },
+  // Acero satinado con grabado oscurecido.
+  acero: { body: 0xb4b6ba, metal: 1, rough: 0.3, chamfer: 0xe4e6ea, chamferRough: 0.12, engrave: 0x1e1e20, engraveRough: 0.8, engraveMetal: 0.1 },
+  // Latón cepillado cálido.
+  laton: { body: 0xc79d55, metal: 1, rough: 0.26, chamfer: 0xf0d49a, chamferRough: 0.1, engrave: 0x2a1c0c, engraveRough: 0.8, engraveMetal: 0.1 },
+};
 
 /** Acero satinado con cepillado horizontal (inserto). */
 export function brushedRough(width: number, height: number, seed: number) {
@@ -170,6 +200,7 @@ export function dotTexture() {
 export interface Materials {
   body: THREE.MeshPhysicalMaterial;
   lid: THREE.MeshPhysicalMaterial;
+  hinge: THREE.MeshPhysicalMaterial;
   chamfer: THREE.MeshPhysicalMaterial;
   interior: THREE.MeshStandardMaterial;
   insert: THREE.MeshPhysicalMaterial;
@@ -178,32 +209,65 @@ export interface Materials {
   steel: THREE.MeshPhysicalMaterial;
   flint: THREE.MeshStandardMaterial;
   wick: THREE.MeshStandardMaterial;
+  engrave: {
+    uEngraveMap: { value: THREE.Texture | null };
+    uEngraveColor: { value: THREE.Color };
+    uEngraveRough: { value: number };
+    uEngraveMetal: { value: number };
+  };
   all: THREE.Material[];
+}
+
+/** Inyecta la máscara de grabado: color, rugosidad y metal propios. */
+function withEngraving(mat: THREE.MeshPhysicalMaterial, uniforms: Materials["engrave"]) {
+  mat.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, uniforms);
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <common>",
+        "#include <common>\nuniform sampler2D uEngraveMap;\nuniform vec3 uEngraveColor;\nuniform float uEngraveRough;\nuniform float uEngraveMetal;",
+      )
+      .replace(
+        "#include <map_fragment>",
+        "#include <map_fragment>\nfloat engrave = texture2D(uEngraveMap, vMapUv).r;\ndiffuseColor.rgb = mix(diffuseColor.rgb, uEngraveColor, engrave);",
+      )
+      .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, uEngraveRough, engrave);")
+      .replace("#include <metalnessmap_fragment>", "#include <metalnessmap_fragment>\nmetalnessFactor = mix(metalnessFactor, uEngraveMetal, engrave);");
+  };
+  mat.customProgramCacheKey = () => "ascua-engrave";
 }
 
 export function makeMaterials(opts: { mobile: boolean; perimeter: number }): Materials {
   const w = opts.mobile ? 1024 : 2048;
   const h = Math.round((w * SPEC.caseH) / opts.perimeter);
   const hLid = Math.round((w * SPEC.lidH) / opts.perimeter);
-  const caseTex = blackFinish(w, h, opts.perimeter, true, 11);
-  const lidTex = blackFinish(w, hLid, opts.perimeter, false, 23);
+  const caseTex = finishTextures(w, h, opts.perimeter, true, 11);
+  const lidTex = finishTextures(w, hLid, opts.perimeter, false, 23);
   const brushed = brushedRough(512, 256, 5);
+  const f = FINISH_SPECS.negro;
 
-  // Negro mate: dieléctrico casi negro con un punto metálico; el brillo lo pone el chaflán.
-  const black = (t: FinishTextures) =>
+  const shell = (t: FinishTextures) =>
     new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
+      color: f.body,
       map: t.color,
-      roughness: 1,
+      roughness: f.rough * 2,
       roughnessMap: t.rough,
-      metalness: 0.25,
+      metalness: f.metal,
       specularIntensity: 1,
       envMapIntensity: 1.35,
     });
 
-  const body = black(caseTex);
-  const lid = black(lidTex);
-  const chamfer = new THREE.MeshPhysicalMaterial({ color: 0xbabcc1, metalness: 1, roughness: 0.2 });
+  const engrave: Materials["engrave"] = {
+    uEngraveMap: { value: caseTex.engrave },
+    uEngraveColor: { value: new THREE.Color(f.engrave) },
+    uEngraveRough: { value: f.engraveRough },
+    uEngraveMetal: { value: f.engraveMetal },
+  };
+  const body = shell(caseTex);
+  withEngraving(body, engrave);
+  const lid = shell(lidTex);
+  const hinge = new THREE.MeshPhysicalMaterial({ color: f.body, metalness: f.metal, roughness: 0.4 });
+  const chamfer = new THREE.MeshPhysicalMaterial({ color: f.chamfer, metalness: 1, roughness: f.chamferRough });
   const interior = new THREE.MeshStandardMaterial({ color: 0x0b0b0d, metalness: 0.4, roughness: 0.7 });
   const insert = new THREE.MeshPhysicalMaterial({
     color: 0x7a7c81,
@@ -221,6 +285,6 @@ export function makeMaterials(opts: { mobile: boolean; perimeter: number }): Mat
   const flint = new THREE.MeshStandardMaterial({ color: 0x4d4a47, metalness: 0.3, roughness: 0.72 });
   const wick = new THREE.MeshStandardMaterial({ map: wickTexture(), roughness: 0.95, metalness: 0 });
 
-  const all = [body, lid, chamfer, interior, insert, insertEdge, plate, steel, flint, wick];
-  return { body, lid, chamfer, interior, insert, insertEdge, plate, steel, flint, wick, all };
+  const all = [body, lid, hinge, chamfer, interior, insert, insertEdge, plate, steel, flint, wick];
+  return { body, lid, hinge, chamfer, interior, insert, insertEdge, plate, steel, flint, wick, engrave, all };
 }

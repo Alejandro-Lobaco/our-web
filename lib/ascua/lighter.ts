@@ -163,7 +163,7 @@ export function buildLighter(opts: { mobile: boolean }): LighterRig {
     [-6.3, -2.3],
     [2.3, 6.3],
   ]) {
-    pieces.carcasa.group.add(mesh(knuckle(-z1, -z0), mats.plate, meshes));
+    pieces.carcasa.group.add(mesh(knuckle(-z1, -z0), mats.hinge, meshes));
   }
 
   // ── Tapa (bisagra como pivote) ───────────────────────────
@@ -185,7 +185,7 @@ export function buildLighter(opts: { mobile: boolean }): LighterRig {
   lidHinge.add(mesh(lidGeo, [mats.lid, mats.chamfer, mats.interior], meshes));
   const lidKnuckle = chamferedCylinder(hinge.r, -2.1, 2.1, 0.25, 28);
   lidKnuckle.rotateX(Math.PI / 2);
-  lidHinge.add(mesh(lidKnuckle, mats.plate, meshes));
+  lidHinge.add(mesh(lidKnuckle, mats.hinge, meshes));
 
   // ── Inserto ──────────────────────────────────────────────
   const ins = SPEC.insert;

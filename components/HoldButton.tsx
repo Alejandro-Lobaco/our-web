@@ -100,7 +100,7 @@ export default function HoldButton({ lit, onStart, onComplete, onExtinguish }: P
         onKeyUp={(e) => {
           if (e.key === " " || e.key === "Enter") release();
         }}
-        className="group relative grid h-[84px] w-[84px] shrink-0 place-items-center rounded-full border border-bone/15 bg-ink/40 backdrop-blur-sm transition-transform duration-150 ease-out active:scale-[0.96]"
+        className={`group relative grid h-[84px] w-[84px] shrink-0 place-items-center rounded-full border border-bone/15 bg-ink/40 backdrop-blur-sm transition-transform duration-150 ease-out active:scale-[0.96] ${lit ? "" : "hold-hint"}`}
       >
         <svg className="absolute inset-0 -rotate-90" viewBox="0 0 84 84" aria-hidden>
           <circle cx="42" cy="42" r={R} fill="none" stroke="rgba(236,232,225,0.12)" strokeWidth="2" />

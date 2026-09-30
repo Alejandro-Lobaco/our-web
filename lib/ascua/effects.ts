@@ -349,3 +349,124 @@ export const GrainShader = {
     }
   `,
 };
+
+// ── Rótulo gigante detrás del producto (se refleja en el suelo) ───────────
+export async function makeWordmark(fontFamily: string, mobile: boolean) {
+  const family = fontFamily || "Georgia, serif";
+  try {
+    await document.fonts.load(`400 120px ${family}`);
+  } catch {
+    // Si la fuente no carga, el canvas usa la de reserva.
+  }
+  const W = mobile ? 1536 : 2560;
+  const H = Math.round(W * 0.3);
+  const c = document.createElement("canvas");
+  c.width = W;
+  c.height = H;
+  const ctx = c.getContext("2d")!;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  const size = H * 0.96;
+  ctx.font = `400 ${size}px ${family}`;
+  const g = ctx.createLinearGradient(0, H * 0.1, 0, H);
+  g.addColorStop(0, "rgba(255,236,214,1)");
+  g.addColorStop(0.7, "rgba(255,226,196,0.75)");
+  g.addColorStop(1, "rgba(255,210,170,0.25)");
+  ctx.fillStyle = g;
+  // Espaciado manual (letterSpacing no está en todos los navegadores).
+  const text = "ASCUA";
+  const spacing = size * 0.04;
+  const widths = [...text].map((ch) => ctx.measureText(ch).width);
+  const total = widths.reduce((a, b) => a + b, 0) + spacing * (text.length - 1);
+  let x = W / 2 - total / 2;
+  ctx.textAlign = "left";
+  [...text].forEach((ch, i) => {
+    ctx.fillText(ch, x, H * 0.86);
+    x += widths[i] + spacing;
+  });
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  const mat = new THREE.MeshBasicMaterial({
+    map: tex,
+    transparent: true,
+    depthWrite: false,
+    color: new THREE.Color(0, 0, 0),
+  });
+  const width = 330;
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, width * (H / W)), mat);
+  mesh.position.set(6, 50, -150);
+  mesh.renderOrder = -1;
+  return mesh;
+}
+
+// ── Brasas: motas cálidas que suben despacio (todo en GPU) ────────────────
+export class Embers {
+  readonly points: THREE.Points;
+  private uniforms = {
+    uTime: { value: 0 },
+    uAmount: { value: 0 },
+    uPx: { value: 800 },
+  };
+
+  constructor(count: number) {
+    const pos = new Float32Array(count * 3);
+    const seed = new Float32Array(count * 4);
+    for (let i = 0; i < count; i++) {
+      pos[i * 3] = -120 + Math.random() * 250;
+      pos[i * 3 + 1] = Math.random() * 170;
+      pos[i * 3 + 2] = -130 + Math.random() * 200;
+      seed[i * 4] = 4 + Math.random() * 11; // velocidad de subida (mm/s)
+      seed[i * 4 + 1] = Math.random() * Math.PI * 2; // fase
+      seed[i * 4 + 2] = 0.35 + Math.random() * 0.8; // tamaño (mm)
+      seed[i * 4 + 3] = 0.4 + Math.random() * 0.6; // brillo
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute("seed", new THREE.BufferAttribute(seed, 4));
+    const mat = new THREE.ShaderMaterial({
+      uniforms: this.uniforms,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      vertexShader: /* glsl */ `
+        attribute vec4 seed;
+        uniform float uTime;
+        uniform float uPx;
+        varying float vAlpha;
+        void main() {
+          vec3 p = position;
+          float h = 170.0;
+          p.y = mod(position.y + uTime * seed.x, h);
+          p.x += sin(uTime * 0.5 + seed.y) * 5.0 + sin(uTime * 1.3 + seed.y * 2.0) * 1.5;
+          p.z += cos(uTime * 0.4 + seed.y) * 4.0;
+          vec4 mv = modelViewMatrix * vec4(p, 1.0);
+          gl_Position = projectionMatrix * mv;
+          gl_PointSize = max(1.0, seed.z * uPx / -mv.z);
+          float edge = smoothstep(0.0, 25.0, p.y) * (1.0 - smoothstep(h - 45.0, h, p.y));
+          float twinkle = 0.65 + 0.35 * sin(uTime * (1.5 + seed.w * 2.0) + seed.y * 5.0);
+          vAlpha = edge * twinkle * seed.w;
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        uniform float uAmount;
+        varying float vAlpha;
+        void main() {
+          float d = length(gl_PointCoord - 0.5);
+          float a = smoothstep(0.5, 0.0, d);
+          gl_FragColor = vec4(vec3(1.0, 0.5, 0.16) * 2.2 * a * vAlpha * uAmount, 1.0);
+        }
+      `,
+    });
+    this.points = new THREE.Points(geo, mat);
+    this.points.frustumCulled = false;
+    this.points.renderOrder = 12;
+  }
+
+  update(time: number, amount: number, camera: THREE.PerspectiveCamera, bufferHeight: number) {
+    this.uniforms.uTime.value = time;
+    this.uniforms.uAmount.value = amount;
+    this.uniforms.uPx.value = bufferHeight / (2 * Math.tan((camera.fov * Math.PI) / 360));
+    this.points.visible = amount > 0.005;
+  }
+}

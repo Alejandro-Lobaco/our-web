@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
-export const PRICE = 89;
-const eur = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
-export const formatEur = (n: number) => eur.format(n);
+import { formatEur, type Finish } from "@/lib/content";
 
 interface Props {
   open: boolean;
+  finish: Finish;
   onClose: () => void;
 }
 
@@ -15,7 +13,8 @@ interface Props {
  * Compra de demostración: no pide datos de pago ni cobra nada.
  * Hoja inferior en móvil, panel centrado en escritorio.
  */
-export default function BuySheet({ open, onClose }: Props) {
+export default function BuySheet({ open, finish, onClose }: Props) {
+  const price = finish.price;
   const [qty, setQty] = useState(1);
   const [done, setDone] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -96,7 +95,7 @@ export default function BuySheet({ open, onClose }: Props) {
         {done ? (
           <div className="mt-4 space-y-4">
             <p className="text-bone/90">
-              Pedido de prueba confirmado: {qty} × ASCUA Negro por {formatEur(PRICE * qty)}.
+              Pedido de prueba confirmado: {qty} × ASCUA {finish.name} por {formatEur(price * qty)}.
             </p>
             <p className="text-sm text-mute">
               ASCUA es un producto conceptual. No se ha cobrado nada y no se enviará ningún mechero.
@@ -113,11 +112,11 @@ export default function BuySheet({ open, onClose }: Props) {
           <>
             <div className="mt-5 flex items-center gap-4 border-y border-bone/10 py-4">
               <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-b from-[#26262a] to-[#0c0c0e] ring-1 ring-bone/10">
-                <div className="h-8 w-5 rounded-[3px] bg-gradient-to-b from-[#2a2a2e] to-[#121214] ring-1 ring-[#cfd1d5]/40" />
+                <div className="h-8 w-5 rounded-[3px] ring-1 ring-white/25" style={{ background: finish.swatch }} />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-medium">ASCUA Negro</p>
-                <p className="text-sm text-mute">Acero 304 · DLC negro mate</p>
+                <p className="font-medium">ASCUA {finish.name}</p>
+                <p className="text-sm text-mute">{finish.detail}</p>
               </div>
               <div className="flex items-center gap-1 rounded-full border border-bone/15">
                 <button
@@ -150,7 +149,7 @@ export default function BuySheet({ open, onClose }: Props) {
               </div>
               <div className="flex justify-between text-base">
                 <dt>Total</dt>
-                <dd className="tabular-nums">{formatEur(PRICE * qty)}</dd>
+                <dd className="tabular-nums">{formatEur(price * qty)}</dd>
               </div>
             </dl>
             <button

@@ -6,9 +6,10 @@ import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import type { Reflector } from "three/examples/jsm/objects/Reflector.js";
 import { BEATS, CUES, sampleCues, type Cue } from "./cues";
-import { bakeStudio, Flame, GrainShader, makeFloor, makePlainFloor, Sparks, STUDIO_BG } from "./effects";
+import { bakeStudio, Embers, Flame, GrainShader, makeFloor, makePlainFloor, makeWordmark, Sparks, STUDIO_BG } from "./effects";
 import { LabelLayer, type ScreenPoint } from "./labels";
 import { buildLighter, type LighterRig, type PieceId } from "./lighter";
+import { FINISH_SPECS, type FinishId } from "./materials";
 import { Sound } from "./sound";
 import { SPEC } from "./spec";
 
@@ -20,6 +21,11 @@ const smoothstep = (a: number, b: number, x: number) => {
 };
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const damp = (cur: number, target: number, k: number, dt: number) => cur + (target - cur) * (1 - Math.exp(-k * dt));
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+const easeOutBack = (t: number) => {
+  const c1 = 1.25;
+  return 1 + (c1 + 1) * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+};
 
 export interface EngineOptions {
   mobile: boolean;
@@ -27,6 +33,10 @@ export interface EngineOptions {
   labelLayer?: HTMLElement | null;
   /** Congela la línea de tiempo en un valor (capturas y depuración). */
   lockTimeline?: number | null;
+  /** Posición de scroll al arrancar (si se recarga a mitad de página no hay intro). */
+  initialTimeline?: number;
+  /** Familia tipográfica del rótulo 3D (la display de la página). */
+  displayFont?: string;
 }
 
 export class AscuaEngine {
@@ -76,6 +86,26 @@ export class AscuaEngine {
   private ro?: ResizeObserver;
   private disposed = false;
   private jumped = false;
+  private wordmark?: THREE.Mesh;
+  private embers!: Embers;
+  private finish: FinishId = "negro";
+  private fin = {
+    body: new THREE.Color(),
+    chamfer: new THREE.Color(),
+    engrave: new THREE.Color(),
+    metal: 0,
+    rough: 0,
+    chamferRough: 0,
+    engraveRough: 0,
+    engraveMetal: 0,
+  };
+  private tmpColor = new THREE.Color();
+  /** Intro al cargar: la tapa salta, la rueda chispea y prende la llama. */
+  private intro = { active: false, t: 0, clinked: false, struck: false };
+  private camIntro = 0;
+  private lastStrike = -10;
+  /** true si la intro no se ha reproducido (movimiento reducido, recarga a mitad, captura). */
+  introSkipped = true;
   private tmp = new THREE.Vector3();
   private screen: ScreenPoint[] = [];
 
@@ -116,6 +146,11 @@ export class AscuaEngine {
     this.flame = new Flame(this.rig.flameAnchor);
     this.sparks = new Sparks(this.dpr);
     this.rig.sparkAnchor.add(this.sparks.group);
+    this.embers = new Embers(mobile ? 70 : 140);
+    this.scene.add(this.embers.points);
+    this.wordmark = await makeWordmark(this.opts.displayFont ?? "", mobile);
+    if (this.disposed) return;
+    this.scene.add(this.wordmark);
 
     // Aristas para el modo plano.
     for (const m of this.rig.meshes) {
@@ -151,7 +186,12 @@ export class AscuaEngine {
     if (this.opts.labelLayer) this.labels = new LabelLayer(this.opts.labelLayer, this.rig.labels);
     this.screen = this.rig.labels.map(() => ({ x: 0, y: 0 }));
 
-    if (this.opts.lockTimeline != null) this.tTarget = this.t = this.opts.lockTimeline;
+    const locked = this.opts.lockTimeline != null;
+    this.tTarget = this.t = clamp(locked ? this.opts.lockTimeline! : (this.opts.initialTimeline ?? 0), 0, CUES[CUES.length - 1].at);
+    const playIntro = !locked && !this.opts.reducedMotion && this.t < 0.3;
+    this.intro.active = playIntro;
+    this.introSkipped = !playIntro;
+    if (!playIntro && this.t < BEATS.heroLit) this.lit = true;
     this.step(0, true);
     await renderer.compileAsync(this.scene, this.camera);
     if (this.disposed) return;
@@ -176,6 +216,18 @@ export class AscuaEngine {
     this.tTarget = next;
   }
 
+  /** Salto directo (menú, raíl de escenas): sin recorrer el guion ni disparar eventos. */
+  snapTo(t: number) {
+    if (this.opts.lockTimeline != null) return;
+    this.tTarget = this.t = clamp(t, 0, CUES[CUES.length - 1].at);
+    this.intro.active = false;
+    this.jumped = true;
+  }
+
+  setFinish(id: FinishId) {
+    this.finish = id;
+  }
+
   setTilt(x: number) {
     this.tilt = clamp(x, -1, 1);
   }
@@ -194,8 +246,13 @@ export class AscuaEngine {
   }
 
   /** Mantener completado: la rueda gira, saltan chispas y prende la llama. */
-  strike() {
+  strike(auto = false) {
     if (this.cue.lid < 0.6) return;
+    this.lastStrike = performance.now() / 1000;
+    if (auto && this.opts.reducedMotion) {
+      this.setLit(true);
+      return;
+    }
     this.wheelVel = -26;
     this.sparks.emit(this.rig.sparkOrigin, 42);
     this.sound.rasp();
@@ -318,8 +375,14 @@ export class AscuaEngine {
     const quiet = snap || this.jumped;
     this.jumped = false;
 
-    // Scroll suavizado (lerp ≈ 0.09 a 60 fps).
-    this.t = snap ? this.tTarget : damp(this.t, this.tTarget, reducedMotion ? 14 : 5.5, dt);
+    // Scroll con peso: amortiguado y con velocidad máxima, así un golpe de
+    // rueda o un lanzamiento en el móvil no hace saltar la cámara.
+    if (snap) this.t = this.tTarget;
+    else {
+      const next = damp(this.t, this.tTarget, reducedMotion ? 14 : 3.8, dt);
+      const maxStep = (reducedMotion ? 6 : 1.05) * dt;
+      this.t += clamp(next - this.t, -maxStep, maxStep);
+    }
     const prevT = this.cue.at;
     const c = sampleCues(this.t, this.cue);
 
@@ -331,6 +394,37 @@ export class AscuaEngine {
     this.pointerS.x = damp(this.pointerS.x, this.pointer.x, 3, dt);
     this.pointerS.y = damp(this.pointerS.y, this.pointer.y, 3, dt);
     this.tiltS = damp(this.tiltS, this.tilt, 4, dt);
+
+    // Intro (tiempo real, no scroll). Si el usuario baja antes de que acabe, se corta.
+    let lidIntro = 1;
+    this.camIntro = 0;
+    if (this.intro.active) {
+      const it = (this.intro.t += realDt);
+      lidIntro = it < 0.55 ? 0 : easeOutBack(clamp((it - 0.55) / 0.55));
+      this.camIntro = 1 - easeOutCubic(clamp(it / 2.9));
+      if (!this.intro.clinked && it > 0.62) {
+        this.intro.clinked = true;
+        this.sound.clink();
+      }
+      if (!this.intro.struck && it > 1.35) {
+        this.intro.struck = true;
+        this.strike(true);
+      }
+      if (it > 3 || this.t > 0.6) this.intro.active = false;
+    }
+
+    // El hero mantiene la llama viva: al volver arriba, se vuelve a encender.
+    if (
+      !quiet &&
+      !this.intro.active &&
+      !this.lit &&
+      this.t < BEATS.heroLit &&
+      c.lid > 0.95 &&
+      c.explode < 0.05 &&
+      performance.now() / 1000 - this.lastStrike > 1.2
+    ) {
+      this.strike(true);
+    }
 
     // Eventos en el beat: chispas a cámara lenta al cruzar el detalle.
     if (!quiet && (prevT - BEATS.sparks) * (this.t - BEATS.sparks) < 0 && this.t > prevT) {
@@ -347,7 +441,7 @@ export class AscuaEngine {
       p.group.position.copy(p.offset).multiplyScalar(k);
     }
     const lidExplode = this.pieceProgress(c.explode, pieces.tapa.order);
-    lidHinge.rotation.z = SPEC.lidOpen * smoothstep(0, 1, c.lid) * (1 - lidExplode);
+    lidHinge.rotation.z = SPEC.lidOpen * smoothstep(0, 1, c.lid) * lidIntro * (1 - lidExplode);
 
     // Sonido de tapa y apagado al cerrar.
     if (!quiet) {
@@ -380,6 +474,20 @@ export class AscuaEngine {
     fu.uWarm.value = this.flameAmt * 0.055;
     fu.uWarmCenter.value.set(SPEC.wick.x, 0);
 
+    // Rótulo y brasas.
+    if (this.wordmark) {
+      const m = c.mark * (this.intro.active ? smoothstep(0.3, 1.8, this.intro.t) : 1);
+      (this.wordmark.material as THREE.MeshBasicMaterial).color.setScalar(0.05 * m);
+      this.wordmark.visible = m > 0.004;
+    }
+    this.embers.update(
+      this.time,
+      (c.embers * 0.75 + this.flameAmt * 0.35) * (reducedMotion ? 0.5 : 1),
+      this.camera,
+      this.h * this.dpr,
+    );
+    this.applyFinish(dt, snap);
+
     // Entorno: gira con el cursor o el giroscopio.
     this.scene.environmentRotation.set(this.pointerS.y * 0.12, this.pointerS.x * 0.55 + this.tiltS * 0.5, 0);
 
@@ -395,9 +503,10 @@ export class AscuaEngine {
     cam.aspect = this.w / this.h;
     const tv = Math.tan((cam.fov * DEG) / 2);
     const th = tv * cam.aspect;
-    const dist = Math.max(c.size / (2 * tv), c.width / (2 * th));
-    const az = (c.az + this.pointerS.x * 3) * DEG;
-    const el = clamp((c.el + this.pointerS.y * 2) * DEG, 1.5 * DEG, 80 * DEG);
+    const intro = easeOutCubic(this.camIntro);
+    const dist = Math.max(c.size / (2 * tv), c.width / (2 * th)) * (1 + 0.38 * intro);
+    const az = (c.az + this.pointerS.x * 3 - 10 * intro) * DEG;
+    const el = clamp((c.el + this.pointerS.y * 2 + 5 * intro) * DEG, 1.5 * DEG, 80 * DEG);
     const [tx, ty, tz] = c.target;
     cam.position.set(tx + dist * Math.cos(el) * Math.sin(az), ty + dist * Math.sin(el), tz + dist * Math.cos(el) * Math.cos(az));
     cam.lookAt(tx, ty, tz);
@@ -406,6 +515,35 @@ export class AscuaEngine {
     cam.setViewOffset(this.w, this.h, -sx * this.w, -sy * this.h, this.w, this.h);
     cam.updateProjectionMatrix();
     cam.updateMatrixWorld();
+  }
+
+  /** Cambio de acabado con fundido: color, metal y rugosidad viajan juntos. */
+  private applyFinish(dt: number, snap: boolean) {
+    const s = FINISH_SPECS[this.finish];
+    const k = snap ? 1 : 1 - Math.exp(-dt * 5);
+    const f = this.fin;
+    f.body.lerp(this.tmpColor.setHex(s.body), k);
+    f.chamfer.lerp(this.tmpColor.setHex(s.chamfer), k);
+    f.engrave.lerp(this.tmpColor.setHex(s.engrave), k);
+    f.metal += (s.metal - f.metal) * k;
+    f.rough += (s.rough - f.rough) * k;
+    f.chamferRough += (s.chamferRough - f.chamferRough) * k;
+    f.engraveRough += (s.engraveRough - f.engraveRough) * k;
+    f.engraveMetal += (s.engraveMetal - f.engraveMetal) * k;
+    const m = this.rig.materials;
+    for (const mat of [m.body, m.lid]) {
+      mat.color.copy(f.body);
+      mat.metalness = f.metal;
+      mat.roughness = f.rough * 2;
+    }
+    m.hinge.color.copy(f.body);
+    m.hinge.metalness = f.metal;
+    m.hinge.roughness = Math.min(1, f.rough + 0.08);
+    m.chamfer.color.copy(f.chamfer);
+    m.chamfer.roughness = f.chamferRough;
+    m.engrave.uEngraveColor.value.copy(f.engrave);
+    m.engrave.uEngraveRough.value = f.engraveRough;
+    m.engrave.uEngraveMetal.value = f.engraveMetal;
   }
 
   private updateBlueprint(dt: number, snap: boolean) {

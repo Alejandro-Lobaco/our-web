@@ -9,15 +9,19 @@ Todo está hecho en código, sin imágenes ni vídeos: el mechero es geometría 
 
 | Escena | Qué pasa |
 | --- | --- |
-| 00 · Hero | El mechero cerrado, pequeño, en un estudio negro. |
-| 01 · Apertura | La tapa se abre sobre la bisagra con un _clinc_. |
-| 02 · Despiece | Ocho piezas se separan con etiquetas y líneas guía; botón «Ver plano». |
-| 03 · Órbita | Vuelta completa para enseñar el negro mate y los chaflanes pulidos. |
-| 04 · Detalle | Macro de la rueda a cámara lenta, con chispas. |
-| 05 · Encender | Mantén pulsado: gira la rueda, saltan chispas y prende la llama. En móvil, la llama sigue la inclinación. |
-| 06 · Cierre | La tapa se cierra (apaga la llama) y aparece la compra de demostración. |
+| 00 · Hero | Intro al cargar: la tapa salta, la rueda chispea y prende la llama. Rótulo gigante en 3D detrás y brasas en el aire. |
+| 01 · Despiece | Ocho piezas se separan con etiquetas y líneas guía; botón «Ver plano». |
+| 02 · Material | Remontaje y órbita lenta; cifras que cuentan al aparecer. |
+| 03 · Detalle | La órbita sigue hasta la macro de la rueda: chispas a cámara lenta. |
+| 04 · Encender | Mantén pulsado: gira la rueda, saltan chispas y prende la llama. En móvil, la llama sigue la inclinación. |
+| 05 · Tu ASCUA | La tapa se cierra; eliges acabado (Negro, Acero, Latón) y el 3D cambia en vivo. Compra de demostración. |
+| Detrás de la escena | Cómo está hecho: modelo procedural, estudio de luz, sonido sintetizado. |
 
 La compra es una demostración: no pide datos de pago ni cobra nada.
+
+**Ritmo del scroll.** Lenis suaviza la rueda del ratón; cada acto se asienta hacia el 20 % de su sección, aguanta mientras
+se lee y sale a partir del 60 %, y ninguna transición ocupa menos de ~1,5 pantallas. La cámara sigue al scroll con
+amortiguación y un tope de velocidad; los saltos del menú a actos lejanos hacen un corte a negro.
 
 ## Desarrollo
 
@@ -35,11 +39,13 @@ Para depurar un plano concreto, `/?t=2.7` congela la línea de tiempo (parte ent
 
 - `app/` — layout, fuentes (Instrument Serif + Inter) y estilos globales (Tailwind 4).
 - `components/Experience.tsx` — página: secciones, revelados guiados por scroll, navegación y conexión con el motor.
-- `components/HoldButton.tsx`, `components/BuySheet.tsx` — mantener para encender y hoja de compra.
+- `components/HoldButton.tsx`, `components/BuySheet.tsx`, `components/FinishPicker.tsx` — mantener para encender, hoja de compra y selector de acabado.
+- `components/Credits.tsx` — «Detrás de la escena» y pie.
+- `lib/content.ts` — actos, acabados y precios.
 - `lib/ascua/spec.ts` — medidas reales en mm.
 - `lib/ascua/geometry.ts`, `lighter.ts` — geometría procedural (barrido de perfiles, torno, extrusión con chaflán) y despiece.
 - `lib/ascua/materials.ts` — texturas generadas en código (granallado, grabado láser, cepillado, mecha).
-- `lib/ascua/effects.ts` — estudio de luz horneado con PMREM, suelo reflectante, llama, chispas y grano.
+- `lib/ascua/effects.ts` — estudio de luz horneado con PMREM, suelo reflectante, llama, chispas, brasas, rótulo 3D y grano.
 - `lib/ascua/cues.ts` — guion de cámara anclado a las secciones.
 - `lib/ascua/engine.ts` — motor: un solo reloj, cámara amortiguada, post-proceso y calidad adaptativa.
 - `lib/ascua/sound.ts` — sonido sintetizado (tapa, rueda, ignición y llama).

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 
 @theme {
   --color-ink: #070708;
@@ -141,9 +142,62 @@ button {
   animation: loader-bar 1.3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
+/* Invita a mantener pulsado: un halo ámbar que respira. */
+@keyframes hold-hint {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 154, 60, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 154, 60, 0.1);
+  }
+}
+.hold-hint {
+  animation: hold-hint 2.6s ease-in-out infinite;
+}
+
+/* Cambio de acabado: el nombre entra desde abajo. */
+@keyframes swap-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em);
+  }
+}
+.swap-in {
+  display: inline-block;
+  animation: swap-in 420ms var(--ease-out-quint) both;
+}
+
+/* Líneas de titular que suben desde una máscara. */
+.line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.line > span {
+  display: inline-block;
+}
+
+@keyframes live-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.live-dot {
+  animation: live-dot 2s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scroll-cue,
-  .loader-bar {
+  .loader-bar,
+  .hold-hint,
+  .live-dot,
+  .swap-in {
     animation: none;
   }
 }
